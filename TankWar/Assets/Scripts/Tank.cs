@@ -1,12 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Unity.Collections;
-using Unity.Jobs;
-using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.SocialPlatforms.Impl;
-using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 namespace Topebox.Tankwars
@@ -129,176 +124,6 @@ namespace Topebox.Tankwars
             return Minimax(predictMoveList, game); //temp return random move
         }
 
-        public struct PredictNextMoveJob : IJob
-        {
-            public NativeList<Move> moves;
-            public Move previousMove;
-            public Move enemies;
-            public GameState game;
-            public void Execute()
-            {
-                Move move = new Move
-                {
-                    depth = enemies.depth + 1,
-                    isMax = previousMove.isMax,
-                };
-                if (previousMove.originalDirection == Constants.Direction.NULL)
-                {
-                    move.originalDirection = Constants.Direction.NULL;
-                }
-                if (move.depth <= 10)
-                {
-
-
-                    var upCell = game.GetNextCell(previousMove.currentPosition, Constants.Direction.UP);
-                    if (game.IsValidCell(upCell))
-                    {
-                        move.currentPosition = upCell;
-                        move.score = move.isMax ? previousMove.score + 1 : previousMove.score - 1;
-                        if (previousMove.originalDirection == Constants.Direction.NULL)
-                        {
-                            move.originalDirection = Constants.Direction.UP;
-                        }
-                        else
-                        {
-                            move.originalDirection = previousMove.originalDirection;
-                        }
-                        bool isOccupied = false;
-                        foreach (Move loopMove in moves)
-                        {
-                            if (loopMove.currentPosition == move.currentPosition && loopMove.depth < move.depth)
-                            {
-                                isOccupied = true;
-                                break;
-                            }
-                        }
-                        if (!isOccupied)
-                        {
-                            moves.Add(move);
-                            PredictNextMoveJob job = new PredictNextMoveJob
-                            {
-                                moves = moves,
-                                enemies = move,
-                                previousMove = enemies,
-                                game = game,
-                            };
-                            JobHandle handler = job.Schedule();
-                            /* PredictNextMove(ref moves, enemies, move, game);*/
-                        }
-
-                    }
-
-                    var downCell = game.GetNextCell(previousMove.currentPosition, Constants.Direction.DOWN);
-                    if (game.IsValidCell(downCell))
-                    {
-                        move.currentPosition = downCell;
-                        move.score = move.isMax ? previousMove.score + 1 : previousMove.score - 1;
-                        if (previousMove.originalDirection == Constants.Direction.NULL)
-                        {
-                            move.originalDirection = Constants.Direction.DOWN;
-                        }
-                        else
-                        {
-                            move.originalDirection = previousMove.originalDirection;
-                        }
-                        bool isOccupied = false;
-                        foreach (Move loopMove in moves)
-                        {
-                            if (loopMove.currentPosition == move.currentPosition && loopMove.depth < move.depth)
-                            {
-                                isOccupied = true;
-                                break;
-                            }
-                        }
-                        if (!isOccupied)
-                        {
-                            moves.Add(move);
-                            PredictNextMoveJob job = new PredictNextMoveJob
-                            {
-                                moves = moves,
-                                enemies = move,
-                                previousMove = enemies,
-                                game = game,
-                            };
-                            JobHandle handler = job.Schedule();
-                        }
-                    }
-
-                    var leftCell = game.GetNextCell(previousMove.currentPosition, Constants.Direction.LEFT);
-                    if (game.IsValidCell(leftCell))
-                    {
-                        move.currentPosition = leftCell;
-                        move.score = move.isMax ? previousMove.score + 1 : previousMove.score - 1;
-                        if (previousMove.originalDirection == Constants.Direction.LEFT)
-                        {
-                            move.originalDirection = Constants.Direction.UP;
-                        }
-                        else
-                        {
-                            move.originalDirection = previousMove.originalDirection;
-                        }
-                        bool isOccupied = false;
-                        foreach (Move loopMove in moves)
-                        {
-                            if (loopMove.currentPosition == move.currentPosition && loopMove.depth < move.depth)
-                            {
-                                isOccupied = true;
-                                break;
-                            }
-                        }
-                        if (!isOccupied)
-                        {
-                            moves.Add(move);
-                            PredictNextMoveJob job = new PredictNextMoveJob
-                            {
-                                moves = moves,
-                                enemies = move,
-                                previousMove = enemies,
-                                game = game,
-                            };
-                            JobHandle handler = job.Schedule();
-                        }
-                    }
-
-                    var rightCell = game.GetNextCell(previousMove.currentPosition, Constants.Direction.RIGHT);
-                    if (game.IsValidCell(rightCell))
-                    {
-                        move.currentPosition = rightCell;
-                        move.score = move.isMax ? previousMove.score + 1 : previousMove.score - 1;
-                        if (previousMove.originalDirection == Constants.Direction.RIGHT)
-                        {
-                            move.originalDirection = Constants.Direction.UP;
-                        }
-                        else
-                        {
-                            move.originalDirection = previousMove.originalDirection;
-                        }
-                        bool isOccupied = false;
-                        foreach (Move loopMove in moves)
-                        {
-                            if (loopMove.currentPosition == move.currentPosition && loopMove.depth < move.depth)
-                            {
-                                isOccupied = true;
-                                break;
-                            }
-                        }
-                        if (!isOccupied)
-                        {
-                            moves.Add(move);
-                            PredictNextMoveJob job = new PredictNextMoveJob
-                            {
-                                moves = moves,
-                                enemies = move,
-                                previousMove = enemies,
-                                game = game,
-                            };
-                            JobHandle handler = job.Schedule();
-                        }
-                    }
-                }
-            }
-        }
-
         void PredictNextMove(ref List<Move> moves, Move previousMove, Move enemies, GameState game)
         {
             Move move = new Move
@@ -379,9 +204,9 @@ namespace Topebox.Tankwars
                 {
                     move.currentPosition = leftCell;
                     move.score = move.isMax ? enemies.score + 1 : enemies.score - 1;
-                    if (previousMove.originalDirection == Constants.Direction.LEFT)
+                    if (previousMove.originalDirection == Constants.Direction.NULL)
                     {
-                        move.originalDirection = Constants.Direction.UP;
+                        move.originalDirection = Constants.Direction.LEFT;
                     }
                     else
                     {
@@ -408,9 +233,9 @@ namespace Topebox.Tankwars
                 {
                     move.currentPosition = rightCell;
                     move.score = move.isMax ? enemies.score + 1 : enemies.score - 1;
-                    if (previousMove.originalDirection == Constants.Direction.RIGHT)
+                    if (previousMove.originalDirection == Constants.Direction.NULL)
                     {
-                        move.originalDirection = Constants.Direction.UP;
+                        move.originalDirection = Constants.Direction.RIGHT;
                     }
                     else
                     {
@@ -442,25 +267,24 @@ namespace Topebox.Tankwars
 
             foreach (Move move in moves)
             {
-                if (maxScore == move.score && move.isMax == true)
+                if (move.isMax)
                 {
-                    if (maxMove.depth < move.depth)
+                    if (maxScore == move.score)
+                    {
+                        if (maxMove.depth < move.depth)
+                        {
+                            maxScore = move.score;
+                            maxMove = move;
+                        }
+                    }
+                    else
+                        if (maxScore < move.score)
                     {
                         maxScore = move.score;
                         maxMove = move;
                     }
-                    else
-                        if (maxMove.depth == move.depth)
-                    {
+                }
 
-                    }
-                }
-                else
-                if (maxScore < move.score && move.isMax == true)
-                {
-                    maxScore = move.score;
-                    maxMove = move;
-                }
             }
 
             return maxMove.originalDirection;

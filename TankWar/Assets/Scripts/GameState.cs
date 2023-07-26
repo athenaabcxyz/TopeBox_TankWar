@@ -95,7 +95,7 @@ namespace Topebox.Tankwars
 
         }
 
-        public Constants.GameResult CheckGameOver()
+        private Constants.GameResult CheckGameOver()
         {
             var hasMoveP1 = HasValidMove(player1Tank.CurrentCell);
             var hasMoveP2 = HasValidMove(player2Tank.CurrentCell);
@@ -205,7 +205,7 @@ namespace Topebox.Tankwars
             return logicMap[(int)nextCell.x, (int)nextCell.y] == Constants.CellType.EMPTY;
         }
 
-        public void OccupyPosition(Vector2 cell, Constants.TankType tankType)
+        private void OccupyPosition(Vector2 cell, Constants.TankType tankType)
         {
             if (logicMap[(int)cell.x, (int)cell.y] == Constants.CellType.EMPTY)
             {
@@ -301,11 +301,14 @@ namespace Topebox.Tankwars
             IsGameOver = false;
         }
 
+        public TextMeshProUGUI redScore;
+        public TextMeshProUGUI blueScore;
         public TextMeshProUGUI TextScore;
 
         private void UpdateScoreUI()
         {
-            TextScore.text = $"<color=red>{ScoreRed}</color> - <color=blue>{ScoreBlue}</color>";
+            redScore.text = ScoreRed.ToString();
+            //$"<color=red>{ScoreRed}</color> - <color=blue>{ScoreBlue}</color>";
         }
 
         private Tank CreateTank(Constants.TankType tankType, int playerId)
