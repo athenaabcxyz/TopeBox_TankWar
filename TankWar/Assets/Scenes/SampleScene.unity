@@ -667,6 +667,7 @@ GameObject:
   m_Component:
   - component: {fileID: 461079448}
   - component: {fileID: 461079447}
+  - component: {fileID: 461079449}
   m_Layer: 0
   m_Name: Board
   m_TagString: Untagged
@@ -688,6 +689,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player1Position: {x: 0, y: 0}
   Player2Position: {x: 9, y: 9}
+  TextScore: {fileID: 1305584339}
   Config:
     MapWidth: 10
     MapHeight: 10
@@ -696,22 +698,25 @@ MonoBehaviour:
     Player2Type: 1
   cellPrefab: {fileID: 6670617074210706919, guid: b87fb67f8e97f954f9c8bfe53c2b77c9,
     type: 3}
+  redTurn: {fileID: 152151830}
+  blueTurn: {fileID: 1381826647}
+  redScore: {fileID: 725986868}
+  blueScore: {fileID: 1052031937}
+  nextMove: {fileID: 1922250128}
+  start: {fileID: 1067742815}
   tankPrefab: {fileID: 1368900456090924798, guid: 2572c488713ba3a42ae11946a84efa08,
     type: 3}
   player1Tank: {fileID: 0}
   player2Tank: {fileID: 0}
   TankParent: {fileID: 510588463}
+  ScoreRed: 0
+  ScoreBlue: 0
   CurrentPlayer: 1
   CurrentTurn: 0
   Player1Moves: []
   Player2Moves: []
   IsGameOver: 0
   CanMove: 0
-  ScoreRed: 0
-  ScoreBlue: 0
-  redScore: {fileID: 725986868}
-  blueScore: {fileID: 1052031937}
-  TextScore: {fileID: 1305584339}
 --- !u!4 &461079448
 Transform:
   m_ObjectHideFlags: 0
@@ -728,6 +733,26 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &461079449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 461079446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 453935834
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &501420801
 GameObject:
   m_ObjectHideFlags: 0
@@ -1879,7 +1904,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1067742816}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 461079447}
+        m_TargetAssemblyTypeName: Topebox.Tankwars.GameState, Assembly-CSharp
+        m_MethodName: StartGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1067742816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2142,12 +2179,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   start: {fileID: 1067742815}
-  redUnready: {fileID: 0}
+  redUnready: {fileID: 1053089725}
   readyText: {fileID: 1630648467}
-  blueUnready: {fileID: 0}
-  redTurn: {fileID: 152151830}
-  blueTurn: {fileID: 1381826647}
+  redPlayer: {fileID: 1726044630}
+  bluePlayer: {fileID: 1693787015}
+  blueUnready: {fileID: 1314361694}
   nextMove: {fileID: 1922250128}
+  startButtonText: {fileID: 271605520}
+  statusText: {fileID: 1305584339}
 --- !u!114 &1160791325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2198,7 +2237,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 22.85, y: -25}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 800, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1305584339
 MonoBehaviour:
@@ -2254,7 +2293,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0

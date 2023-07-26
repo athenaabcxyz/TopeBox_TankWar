@@ -10,6 +10,17 @@ public class ChatSystem : NetworkBehaviour
     [SerializeField] TMP_InputField message;
     string currentUser;
 
+
+    public override void OnNetworkDespawn()
+    {
+        chatBox.text = "";
+        base.OnNetworkDespawn();
+    }
+
+    public void Start()
+    {
+        chatBox.text = "";
+    }
     public void GetCurrentUser()
     {
         if (NetworkManager.Singleton.IsHost)
@@ -25,13 +36,24 @@ public class ChatSystem : NetworkBehaviour
 
     public void CallMessageRPC()
     {
+        GetCurrentUser();
         string getMessage = message.text;
         SendMessageServerRPC(currentUser, getMessage);
     }
-    [ServerRpc]
-    public void SendMessageServerRPC(string currentUser, string message)
+
+    [ClientRpc]
+    public void SendMessageClientRpc(string currentUser, string message)
     {
-        if(currentUser=="Red")
+        Addtext(currentUser, message);
+    }
+    [ServerRpc(RequireOwnership =false)]
+    public void SendMessageServerRPC(string currentUser, string message)
+    {       
+        SendMessageClientRpc(currentUser, message);
+    }
+    public void Addtext(string currentUser, string message)
+    {
+        if (currentUser == "Red")
         {
             //$"<color=red>{ScoreRed}</color> - <color=blue>{ScoreBlue}</color>";
             chatBox.text += $"<color=red>{currentUser}</color>: {message}\n";
@@ -40,6 +62,5 @@ public class ChatSystem : NetworkBehaviour
         {
             chatBox.text += $"<color=blue>{currentUser}</color>: {message}\n";
         }
-        
     }
 }
