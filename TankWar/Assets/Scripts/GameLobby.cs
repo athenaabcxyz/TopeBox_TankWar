@@ -21,7 +21,7 @@ public class GameLobby : NetworkBehaviour
     bool isRedReadyClient = false;
     bool isBlueReadyClient = false;
 
-    private readonly NetworkVariable<bool> isRedReady = new NetworkVariable<bool>(writePerm:NetworkVariableWritePermission.Owner);
+    private readonly NetworkVariable<bool> isRedReady = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
     private readonly NetworkVariable<bool> isBlueReady = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
 
 
@@ -48,7 +48,7 @@ public class GameLobby : NetworkBehaviour
             bluePlayer.SetText("You");
             statusText.SetText("Wait for players to ready.");
         }
-        base.OnNetworkSpawn();     
+        base.OnNetworkSpawn();
     }
 
     // Update is called once per frame
@@ -87,41 +87,61 @@ public class GameLobby : NetworkBehaviour
         }
         redUnready.SetActive(!isRedReadyClient);
         blueUnready.SetActive(!isBlueReadyClient);
+        if (NetworkManager.Singleton.IsHost)
+        {
+            if (isRedReadyClient)
+            {
+                readyText.SetText("Unready");
+            }
+            else
+            {
+                readyText.SetText("Ready");
+            }
+        }
+        else
+        {
+            if (isBlueReadyClient)
+            {
+                readyText.SetText("Unready");
+            }
+            else
+            {
+                readyText.SetText("Ready");
+            }
+        }
     }
 
     public void ReadyButtonClick()
     {
-            if (NetworkManager.Singleton.IsHost)
+        if (NetworkManager.Singleton.IsHost)
+        {
+            if (isRedReadyClient)
             {
-                if (isRedReadyClient)
-                {
-                    isRedReadyClient = false;
-                    readyText.SetText("Ready");
-                }
-                else
-                {
-                    isRedReadyClient = true;
-                    readyText.SetText("Unready");
-                }
+                isRedReadyClient = false;
+                readyText.SetText("Ready");
             }
             else
             {
-                SubmitBlueReadyOnLickServerRpc();
+                isRedReadyClient = true;
+                readyText.SetText("Unready");
             }
+        }
+        else
+        {
+            SubmitBlueReadyOnLickServerRpc();
+        }
     }
 
-    [ServerRpc(RequireOwnership =false)]
-    void SubmitBlueReadyOnLickServerRpc(ServerRpcParams rpcParams =default)
+    [ServerRpc(RequireOwnership = false)]
+    void SubmitBlueReadyOnLickServerRpc(ServerRpcParams rpcParams = default)
     {
         if (isBlueReadyClient)
         {
-            isBlueReady.Value = false;
-            readyText.SetText("Ready");
+            isBlueReadyClient = false;
         }
         else
         {
             isBlueReadyClient = true;
-            readyText.SetText("Unready");
         }
     }
     public void StartGame()
