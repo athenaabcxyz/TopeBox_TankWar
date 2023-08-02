@@ -6,19 +6,19 @@ namespace Topebox.Tankwars
     {
         public enum Direction
         {
-            UP,
-            LEFT,
-            DOWN,
-            RIGHT,
-            NULL
+            UP =1,
+            LEFT =2,
+            DOWN =3,
+            RIGHT =4,
+            NULL =0
         }
 
         public enum CellType
         {
-            EMPTY,
-            WALL,
-            RED,
-            BLUE,
+            EMPTY = 0,
+            WALL = 1,
+            RED = 2,
+            BLUE = 3,
         } 
         
         public enum GameResult
@@ -35,4 +35,6 @@ namespace Topebox.Tankwars
             BLUE
         }
     }
+
+
 }

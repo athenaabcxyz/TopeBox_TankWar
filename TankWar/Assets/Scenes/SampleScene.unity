@@ -824,6 +824,7 @@ MonoBehaviour:
   Player1Position: {x: 0, y: 0}
   Player2Position: {x: 9, y: 9}
   TextScore: {fileID: 1305584339}
+  isGameStarted: 0
   Config:
     MapWidth: 10
     MapHeight: 10
@@ -836,6 +837,7 @@ MonoBehaviour:
   blueTurn: {fileID: 1381826647}
   redScore: {fileID: 725986868}
   blueScore: {fileID: 1052031937}
+  moveText: {fileID: 1598048584}
   nextMove: {fileID: 1922250128}
   start: {fileID: 1067742815}
   tankPrefab: {fileID: 1368900456090924798, guid: 2572c488713ba3a42ae11946a84efa08,
@@ -2326,8 +2328,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 461079447}
-        m_TargetAssemblyTypeName: Topebox.Tankwars.GameState, Assembly-CSharp
+      - m_Target: {fileID: 1160791324}
+        m_TargetAssemblyTypeName: GameLobby, Assembly-CSharp
         m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
@@ -2609,8 +2611,10 @@ MonoBehaviour:
   bluePlayer: {fileID: 1693787015}
   blueUnready: {fileID: 1314361694}
   nextMove: {fileID: 1922250128}
+  readyButton: {fileID: 1544388096}
   startButtonText: {fileID: 271605520}
   statusText: {fileID: 1305584339}
+  gamestate: {fileID: 461079447}
 --- !u!114 &1160791325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4287,7 +4291,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 461079447}
         m_TargetAssemblyTypeName: Topebox.Tankwars.GameState, Assembly-CSharp
-        m_MethodName: UpdateMove
+        m_MethodName: MoveButtonOnLick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Topebox.Tankwars;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -15,11 +16,14 @@ public class GameLobby : NetworkBehaviour
     [SerializeField] TextMeshProUGUI bluePlayer;
     [SerializeField] GameObject blueUnready;
     [SerializeField] Button nextMove;
+    [SerializeField] Button readyButton;
     [SerializeField] TextMeshProUGUI startButtonText;
     [SerializeField] TextMeshProUGUI statusText;
+    [SerializeField] GameState gamestate;
 
     bool isRedReadyClient = false;
     bool isBlueReadyClient = false;
+    bool isTheGameStarted = false;
 
     private readonly NetworkVariable<bool> isRedReady = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
     private readonly NetworkVariable<bool> isBlueReady = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
@@ -54,61 +58,66 @@ public class GameLobby : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isRedReady.Value && isBlueReady.Value)
+        if (!isTheGameStarted)
         {
-            start.enabled = true;
+            if (isRedReady.Value && isBlueReady.Value)
+            {
+                start.enabled = true;
+                if (NetworkManager.Singleton.IsHost)
+                {
+                    startButtonText.SetText("Start");
+                }
+                else
+                {
+                    startButtonText.SetText("Wait for Host");
+                    start.enabled = false;
+                }
+
+                statusText.SetText("Wait for game to start.");
+            }
+            else
+            {
+                start.enabled = false;
+
+                startButtonText.SetText("Waiting");
+                statusText.SetText("Wait for players to ready.");
+            }
+            if (IsOwner)
+            {
+                isBlueReady.Value = isBlueReadyClient;
+                isRedReady.Value = isRedReadyClient;
+            }
+            else
+            {
+                isRedReadyClient = isRedReady.Value;
+                isBlueReadyClient = isBlueReady.Value;
+            }
+            redUnready.SetActive(!isRedReadyClient);
+            blueUnready.SetActive(!isBlueReadyClient);
             if (NetworkManager.Singleton.IsHost)
             {
-                startButtonText.SetText("Start");
+                if (isRedReadyClient)
+                {
+                    readyText.SetText("Unready");
+                }
+                else
+                {
+                    readyText.SetText("Ready");
+                }
             }
             else
             {
-                startButtonText.SetText("Wait for Host");
-            }
-
-            statusText.SetText("Wait for game to start.");
-        }
-        else
-        {
-            start.enabled = false;
-
-            startButtonText.SetText("Waiting");
-            statusText.SetText("Wait for players to ready.");
-        }
-        if (IsOwner)
-        {
-            isBlueReady.Value = isBlueReadyClient;
-            isRedReady.Value = isRedReadyClient;
-        }
-        else
-        {
-            isRedReadyClient = isRedReady.Value;
-            isBlueReadyClient = isBlueReady.Value;
-        }
-        redUnready.SetActive(!isRedReadyClient);
-        blueUnready.SetActive(!isBlueReadyClient);
-        if (NetworkManager.Singleton.IsHost)
-        {
-            if (isRedReadyClient)
-            {
-                readyText.SetText("Unready");
-            }
-            else
-            {
-                readyText.SetText("Ready");
+                if (isBlueReadyClient)
+                {
+                    readyText.SetText("Unready");
+                }
+                else
+                {
+                    readyText.SetText("Ready");
+                }
             }
         }
-        else
-        {
-            if (isBlueReadyClient)
-            {
-                readyText.SetText("Unready");
-            }
-            else
-            {
-                readyText.SetText("Ready");
-            }
-        }
+        
     }
 
     public void ReadyButtonClick()
@@ -146,8 +155,24 @@ public class GameLobby : NetworkBehaviour
     }
     public void StartGame()
     {
-        nextMove.gameObject.SetActive(true);
-        start.gameObject.SetActive(false);
+        gamestate.StartGame();
+        StartGameServerRPC();
     }
+
+    [ServerRpc(RequireOwnership =false)]
+    public void StartGameServerRPC()
+    {
+        StartGameClientRPC();
+    }
+
+    [ClientRpc]
+    public void StartGameClientRPC()
+    {
+        isTheGameStarted = true;
+        readyButton.gameObject.SetActive(false);
+        start.enabled = false;
+        startButtonText.SetText("Game started");
+    }
+
 }
 

@@ -21,6 +21,14 @@ public class ChatSystem : NetworkBehaviour
     {
         chatBox.text = "";
     }
+
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            CallMessageRPC();
+        }
+    }
     public void GetCurrentUser()
     {
         if (NetworkManager.Singleton.IsHost)
@@ -45,6 +53,7 @@ public class ChatSystem : NetworkBehaviour
     public void SendMessageClientRpc(string currentUser, string message)
     {
         Addtext(currentUser, message);
+        chatBox.text = "";
     }
     [ServerRpc(RequireOwnership =false)]
     public void SendMessageServerRPC(string currentUser, string message)
